@@ -13,8 +13,9 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Default remote path
-REMOTE_CONFIG_PATH="/wgprofiles/hepia"
+# Default remote path and user
+REMOTE_USER="wg"
+REMOTE_CONFIG_PATH="/home/wg/hepia"
 
 print_banner() {
     echo -e "${CYAN}"
@@ -76,7 +77,7 @@ list_remote_configs() {
     
     # Get list of .conf files from remote server
     CONFIG_LIST=$(ssh -p "$SSH_PORT" -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new \
-        "wgprofiles@${SERVER_ADDRESS}" \
+        "${REMOTE_USER}@${SERVER_ADDRESS}" \
         "ls -1 ${REMOTE_CONFIG_PATH}/*.conf 2>/dev/null" 2>&1) || {
         print_error "Failed to connect or no config files found"
         echo -e "    ${YELLOW}Error: ${CONFIG_LIST}${NC}"
@@ -131,7 +132,7 @@ download_config() {
     LOCAL_CONFIG="${TEMP_DIR}/${SELECTED_FILENAME}"
     
     scp -P "$SSH_PORT" -o StrictHostKeyChecking=accept-new \
-        "wgprofiles@${SERVER_ADDRESS}:${SELECTED_CONFIG}" \
+        "${REMOTE_USER}@${SERVER_ADDRESS}:${SELECTED_CONFIG}" \
         "$LOCAL_CONFIG" || {
         print_error "Failed to download config file"
         rm -rf "$TEMP_DIR"
